@@ -1,0 +1,103 @@
+-- [[ PRIMO POGI | MUSCLE LEGENDS AUTO TRADE ]] --
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/memejames/elerium-v2-ui-library/main/Library", true))()
+
+local window = library:AddWindow("PRIMO POGI | MUSCLE LEGENDS", {
+    main_color = Color3.fromRGB(255, 212, 42),
+    min_size = Vector2.new(650, 820),
+})
+
+-- TABS
+local Trade = window:AddTab("Auto Trade")
+local Main = window:AddTab("Farming")
+
+-- [[ AUTO TRADE TAB - PRIMO POGI FEATURES ]] --
+
+-- Dropdown para sa Player Selection
+local selectedPlayer = ""
+local function getPlayers()
+    local p = {}
+    for _, v in pairs(game.Players:GetPlayers()) do
+        if v ~= game.Players.LocalPlayer then table.insert(p, v.Name) end
+    end
+    return p
+end
+
+Trade:AddDropdown("Select Player", getPlayers(), function(v)
+    selectedPlayer = v
+end)
+
+Trade:AddDropdown("Select Trade Pet", {"Best Pets", "All Pets", "Rare Only"}, function(v)
+    _G.TradePetSelection = v
+end)
+
+-- Auto Trade Toggles (Kagaya ng Screenshot mo)
+Trade:AddSwitch("Auto Trade", function(state)
+    _G.AutoTradeLoop = state
+    task.spawn(function()
+        while _G.AutoTradeLoop do
+            if selectedPlayer ~= "" then
+                local target = game.Players:FindFirstChild(selectedPlayer)
+                if target then
+                    game:GetService("ReplicatedStorage").rEvents.tradeEvent:FireServer("sendTradeRequest", target)
+                end
+            end
+            task.wait(5)
+        end
+    end)
+end)
+
+Trade:AddSwitch("Auto Trade All", function(state)
+    _G.AutoTradeAll = state
+    task.spawn(function()
+        while _G.AutoTradeAll do
+            for _, v in pairs(game.Players:GetPlayers()) do
+                if v ~= game.Players.LocalPlayer then
+                    game:GetService("ReplicatedStorage").rEvents.tradeEvent:FireServer("sendTradeRequest", v)
+                    task.wait(2)
+                end
+            end
+            task.wait(10)
+        end
+    end)
+end)
+
+Trade:AddDropdown("Select Pet to Buy", {"Blue Crystal", "Frost Crystal", "Mythical Crystal", "Inferno Crystal"}, function(v)
+    _G.CrystalToBuy = v
+end)
+
+Trade:AddSwitch("Auto Hatch Pet", function(state)
+    _G.AutoHatch = state
+    task.spawn(function()
+        while _G.AutoHatch do
+            if _G.CrystalToBuy then
+                game:GetService("ReplicatedStorage").rEvents.openCrystalEvent:FireServer(_G.CrystalToBuy)
+            end
+            task.wait(0.8)
+        end
+    end)
+end)
+
+Trade:AddSwitch("Auto Evolve Pet", function(state)
+    _G.AutoEvolve = state
+    task.spawn(function()
+        while _G.AutoEvolve do
+            game:GetService("ReplicatedStorage").rEvents.petEvolveEvent:FireServer("evolveAllPets")
+            task.wait(5)
+        end
+    end)
+end)
+
+-- [[ FARMING TAB ]] --
+Main:AddSwitch("Auto Lift", function(s) 
+    _G.Lift = s 
+    while _G.Lift do 
+        game:GetService("ReplicatedStorage").rEvents.liftingEvent:FireServer("Weight") 
+        task.wait() 
+    end 
+end)
+
+-- Anti-AFK
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    game:GetService("VirtualUser"):CaptureController()
+    game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+end)
