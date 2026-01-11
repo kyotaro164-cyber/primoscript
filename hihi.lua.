@@ -1,0 +1,15 @@
+-- [[ PRIMO POGI | ANTI-AFK UTILITY ]] --
+local vu = game:GetService("VirtualUser")
+
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    vu:CaptureController()
+    vu:ClickButton2(Vector2.new())
+    print("Anti-AFK: Iniiwasan ang pagkaka-kick kay Primo Pogi!")
+end)
+
+-- Notification para alam mong gumagana
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "PRIMO POGI ANTI-AFK",
+    Text = "Aktibo na ang Anti-AFK. Hindi ka na ma-ki-kick!",
+    Duration = 5
+})
