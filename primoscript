@@ -1,0 +1,144 @@
+-- [[ PRIMOONTOP ULTIMATE HUB | SLH CLAN OFFICIAL ]] --
+
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/memejames/elerium-v2-ui-library/main/Library", true))()
+
+local window = library:AddWindow(" SLH Clan | PRIMOONTOP PRIVATE", {
+    main_color = Color3.fromRGB(0, 85, 255),
+    min_size = Vector2.new(500, 600),
+})
+
+-- [[ ANTI-AFK SYSTEM ]] --
+local VirtualUser = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+end)
+
+-- [[ ALL TABS BASE SA SCREENSHOTS ]] --
+local MainTab = window:AddTab("Main Farm")
+local RockTab = window:AddTab("Rock")
+local RebirthTab = window:AddTab("Rebirths")
+local PetTab = window:AddTab("Pets")
+local KillTab = window:AddTab("Kill")
+local TradeTab = window:AddTab("Trade")
+local TeleportTab = window:AddTab("Teleport")
+local MiscTab = window:AddTab("Misc")
+local CreditsTab = window:AddTab("Credits")
+
+-- [[ MAIN FARM ]] --
+MainTab:AddSwitch("Auto Lift (Weights)", function(Value)
+    _G.AutoLift = Value
+    task.spawn(function()
+        while _G.AutoLift do
+            game:GetService("ReplicatedStorage").rEvents.liftingEvent:FireServer("Weight")
+            task.wait(0.1)
+        end
+    end)
+end)
+
+MainTab:AddSwitch("Auto Pushups", function(Value)
+    _G.AutoPushups = Value
+    task.spawn(function()
+        while _G.AutoPushups do
+            game:GetService("ReplicatedStorage").rEvents.pushupsEvent:FireServer("Pushups")
+            task.wait(0.1)
+        end
+    end)
+end)
+
+-- [[ ROCK FARM ]] --
+RockTab:AddSwitch("Auto Rock Farm", function(Value)
+    _G.AutoRock = Value
+    task.spawn(function()
+        while _G.AutoRock do
+            game:GetService("ReplicatedStorage").rEvents.miningEvent:FireServer("Rock")
+            task.wait(0.1)
+        end
+    end)
+end)
+
+-- [[ REBIRTHS ]] --
+RebirthTab:AddSwitch("Auto Rebirth", function(Value)
+    _G.AutoRebirth = Value
+    task.spawn(function()
+        while _G.AutoRebirth do
+            game:GetService("ReplicatedStorage").rEvents.rebirthEvent:FireServer("rebirthRequest")
+            task.wait(5)
+        end
+    end)
+end)
+
+-- [[ PETS & HATCHING ]] --
+PetTab:AddDropdown("Select Crystal", {"Blue Crystal", "Green Crystal", "Frost Crystal", "Mythical Crystal", "Legendary Crystal"}, function(selected)
+    _G.SelectedCrystal = selected
+end)
+
+PetTab:AddSwitch("Auto Hatch Pet", function(Value)
+    _G.AutoHatch = Value
+    task.spawn(function()
+        while _G.AutoHatch do
+            if _G.SelectedCrystal then
+                game:GetService("ReplicatedStorage").rEvents.openCrystalEvent:FireServer(_G.SelectedCrystal)
+            end
+            task.wait(1)
+        end
+    end)
+end)
+
+PetTab:AddSwitch("Auto Evolve Pet", function(Value)
+    _G.AutoEvolve = Value
+    task.spawn(function()
+        while _G.AutoEvolve do
+            game:GetService("ReplicatedStorage").rEvents.evolvePetEvent:FireServer("EvolveAll")
+            task.wait(2)
+        end
+    end)
+end)
+
+-- [[ KILL TABS ]] --
+KillTab:AddSwitch("Kill Aura (Radius)", function(Value)
+    _G.KillAura = Value
+    task.spawn(function()
+        while _G.KillAura do
+            for _, v in pairs(game.Players:GetPlayers()) do
+                if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                    local dist = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).magnitude
+                    if dist < 20 then
+                        game:GetService("ReplicatedStorage").rEvents.punchEvent:FireServer("Punch")
+                    end
+                end
+            end
+            task.wait(0.1)
+        end
+    end)
+end)
+
+-- [[ TRADE TABS ]] --
+TradeTab:AddSwitch("Auto Trade All", function(Value)
+    _G.AutoTradeAll = Value
+    -- Logic for auto accepting trade
+end)
+
+TradeTab:AddSwitch("Auto Accept Trade", function(Value)
+    _G.AutoAccept = Value
+end)
+
+-- [[ TELEPORTS ]] --
+TeleportTab:AddButton("Spawn Island", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 4, 0)
+end)
+
+TeleportTab:AddButton("Frost Island", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-2544, 13, -435)
+end)
+
+-- [[ MISC / MOVEMENT ]] --
+MiscTab:AddSlider("WalkSpeed", 16, 500, function(v) game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v end)
+MiscTab:AddSlider("JumpPower", 50, 500, function(v) game.Players.LocalPlayer.Character.Humanoid.JumpPower = v end)
+
+-- [[ CREDITS ]] --
+CreditsTab:AddLabel("Made by: PRIMO")
+CreditsTab:AddLabel("SLH Clan Private Script")
+CreditsTab:AddLabel("PRIMO ON TOP")
+
+game.StarterGui:SetCore("SendNotification", {Title = "PRIMOONTOP", Text = "All Tabs Loaded!", Duration = 5})
