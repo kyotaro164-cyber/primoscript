@@ -1,0 +1,139 @@
+-- [[ PRIMO PRIVATE SCRIPT - OFFICIAL GITHUB RELEASE ]] --
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "PRIMO PRIVATE SCRIPT | Muscle Legends",
+   LoadingTitle = "Primo Hub is Starting...",
+   LoadingSubtitle = "by PRIMO",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "PrimoScripts",
+      FileName = "MuscleHub"
+   }
+})
+
+-- [[ ANTI-AFK SYSTEM ]] --
+local VirtualUser = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+end)
+
+-- [[ MAIN FARM TAB ]] --
+local MainTab = Window:CreateTab("Main Farm", 4483362458)
+
+MainTab:CreateToggle({
+   Name = "Auto Lift (Weights)",
+   CurrentValue = false,
+   Flag = "AutoLift",
+   Callback = function(Value)
+      _G.AutoLift = Value
+      task.spawn(function()
+         while _G.AutoLift do
+            local remote = game:GetService("ReplicatedStorage").rEvents:FindFirstChild("liftingEvent")
+            if remote then remote:FireServer("Weight") end
+            task.wait(0.1)
+         end
+      end)
+   end,
+})
+
+MainTab:CreateToggle({
+   Name = "Auto Rock Farm",
+   CurrentValue = false,
+   Flag = "AutoRock",
+   Callback = function(Value)
+      _G.AutoRock = Value
+      task.spawn(function()
+         while _G.AutoRock do
+            local remote = game:GetService("ReplicatedStorage").rEvents:FindFirstChild("miningEvent")
+            if remote then remote:FireServer("Rock") end
+            task.wait(0.1)
+         end
+      end)
+   end,
+})
+
+-- [[ REBIRTH TAB ]] --
+local RebirthTab = Window:CreateTab("Rebirths", 4483362458)
+
+RebirthTab:CreateToggle({
+   Name = "Auto Rebirth",
+   CurrentValue = false,
+   Flag = "AutoRebirth",
+   Callback = function(Value)
+      _G.AutoRebirth = Value
+      task.spawn(function()
+         while _G.AutoRebirth do
+            local remote = game:GetService("ReplicatedStorage").rEvents:FindFirstChild("rebirthEvent")
+            if remote then remote:FireServer("rebirthRequest") end
+            task.wait(5)
+         end
+      end)
+   end,
+})
+
+-- [[ TELEPORT TAB ]] --
+local TpTab = Window:CreateTab("Teleports", 4483362458)
+
+local function TeleportTo(coords)
+    local player = game.Players.LocalPlayer
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = coords
+    end
+end
+
+TpTab:CreateButton({Name = "Spawn Island", Callback = function() TeleportTo(CFrame.new(0, 4, 0)) end})
+TpTab:CreateButton({Name = "Frost Island (10K+)", Callback = function() TeleportTo(CFrame.new(-2544, 13, -435)) end})
+TpTab:CreateButton({Name = "Mythical Island (100K+)", Callback = function() TeleportTo(CFrame.new(2256, 13, 1058)) end})
+TpTab:CreateButton({Name = "Eternal Island (1M+)", Callback = function() TeleportTo(CFrame.new(-5414, 13, -2824)) end})
+TpTab:CreateButton({Name = "Legendary Island (5M+)", Callback = function() TeleportTo(CFrame.new(4226, 988, -3623)) end})
+
+-- [[ MOVEMENT TAB ]] --
+local MoveTab = Window:CreateTab("Movement", 4483362458)
+
+MoveTab:CreateSlider({
+   Name = "WalkSpeed",
+   Range = {16, 500},
+   Increment = 1,
+   Suffix = "Speed",
+   CurrentValue = 16,
+   Flag = "SpeedSlider",
+   Callback = function(Value)
+      local char = game.Players.LocalPlayer.Character
+      if char and char:FindFirstChild("Humanoid") then
+          char.Humanoid.WalkSpeed = Value
+      end
+   end,
+})
+
+MoveTab:CreateSlider({
+   Name = "JumpPower",
+   Range = {50, 500},
+   Increment = 1,
+   Suffix = "Power",
+   CurrentValue = 50,
+   Flag = "JumpSlider",
+   Callback = function(Value)
+      local char = game.Players.LocalPlayer.Character
+      if char and char:FindFirstChild("Humanoid") then
+          char.Humanoid.JumpPower = Value
+      end
+   end,
+})
+
+-- [[ CREDITS TAB ]] --
+local CreditsTab = Window:CreateTab("Credits", 4483362458)
+CreditsTab:CreateLabel("Script Creator: PRIMO")
+CreditsTab:CreateLabel("Status: PRIMO ON TOP")
+CreditsTab:CreateButton({
+   Name = "Destroy UI",
+   Callback = function() Rayfield:Destroy() end,
+})
+
+Rayfield:Notify({
+   Title = "Success!",
+   Content = "PRIMO Ultimate Hub is Ready to Use!",
+   Duration = 5,
+})
