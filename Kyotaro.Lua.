@@ -1,0 +1,124 @@
+-- [[ SLH | PRIMO PUBLIC SCRIPT ]] --
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("SLH | PRIMO PUBLIC SCRIPT", "DarkTheme")
+
+-- [[ TABS SYSTEM ]] --
+-- Sinunod ang layout na may 10 tabs base sa sample
+local Main = Window:NewTab("Main")
+local Farming = Window:NewTab("Farming")
+local Server = Window:NewTab("Server")
+local Killing = Window:NewTab("Killing")
+local Specs = Window:NewTab("Specs")
+local Stats = Window:NewTab("Stats")
+local Crystal = Window:NewTab("Crystal")
+local Teleport = Window:NewTab("Teleport")
+local Misc = Window:NewTab("Misc")
+local Info = Window:NewTab("Info")
+
+-- [[ MAIN TAB ]] --
+local MainSection = Main:NewSection("Main Controls")
+MainSection:NewToggle("Auto Lift", "Kusang magbubuhat ng Weights", function(state)
+    _G.Lift = state
+    task.spawn(function()
+        while _G.Lift do
+            game:GetService("ReplicatedStorage").rEvents.liftingEvent:FireServer("Weight")
+            task.wait(0.1)
+        end
+    end)
+end)
+
+MainSection:NewToggle("Auto Pushups", "Kusang mag-pu-pushups", function(state)
+    _G.Pushups = state
+    task.spawn(function()
+        while _G.Pushups do
+            game:GetService("ReplicatedStorage").rEvents.pushupsEvent:FireServer("Pushups")
+            task.wait(0.1)
+        end
+    end)
+end)
+
+-- [[ FARMING TAB ]] --
+local FarmSection = Farming:NewSection("Rock Farming")
+FarmSection:NewToggle("Auto Rock Farm", "Kusang mag-mimina ng Rock", function(state)
+    _G.Rock = state
+    task.spawn(function()
+        while _G.Rock do
+            game:GetService("ReplicatedStorage").rEvents.miningEvent:FireServer("Rock")
+            task.wait(0.1)
+        end
+    end)
+end)
+
+-- [[ KILLING TAB ]] --
+local KillSection = Killing:NewSection("Combat Settings")
+KillSection:NewToggle("Kill Aura (Radius)", "Awtomatikong manununtok sa paligid", function(state)
+    _G.KillAura = state
+    task.spawn(function()
+        while _G.KillAura do
+            for _, v in pairs(game.Players:GetPlayers()) do
+                if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                    local dist = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).magnitude
+                    if dist < 20 then
+                        game:GetService("ReplicatedStorage").rEvents.punchEvent:FireServer("Punch")
+                    end
+                end
+            end
+            task.wait(0.1)
+        end
+    end)
+end)
+
+-- [[ CRYSTAL TAB ]] --
+local CrystalSection = Crystal:NewSection("Crystal Hatching")
+CrystalSection:NewDropdown("Select Crystal", "Pumili ng Crystal", {"Blue Crystal", "Green Crystal", "Frost Crystal", "Mythical Crystal", "Legendary Crystal"}, function(current)
+    _G.SelectedCrystal = current
+end)
+
+CrystalSection:NewToggle("Auto Hatch Pet", "Awtomatikong bibili ng Pet", function(state)
+    _G.Hatch = state
+    task.spawn(function()
+        while _G.Hatch do
+            if _G.SelectedCrystal then
+                game:GetService("ReplicatedStorage").rEvents.openCrystalEvent:FireServer(_G.SelectedCrystal)
+            end
+            task.wait(1.2)
+        end
+    end)
+end)
+
+-- [[ TELEPORT TAB ]] --
+local TPSection = Teleport:NewSection("World Teleports")
+TPSection:NewButton("Spawn Island", "Teleport sa Start Area", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 4, 0)
+end)
+TPSection:NewButton("Frost Island", "Teleport sa Frost Area", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-2544, 13, -435)
+end)
+
+-- [[ MISC TAB ]] --
+-- Sinunod ang Misc 1, 2, 3 style base sa sample
+local Misc1 = Misc:NewSection("Misc 1 - Movement")
+Misc1:NewSlider("WalkSpeed", "Bilis ng takbo", 500, 16, function(s)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
+end)
+
+local Misc2 = Misc:NewSection("Misc 2 - Character")
+Misc2:NewSlider("JumpPower", "Taas ng talon", 500, 50, function(s)
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = s
+end)
+
+local Misc3 = Misc:NewSection("Misc 3 - Utilities")
+Misc3:NewButton("Anti-AFK", "Iwas ma-kick pag idle", function()
+    local vu = game:GetService("VirtualUser")
+    game:GetService("Players").LocalPlayer.Idled:Connect(function()
+        vu:CaptureController()
+        vu:ClickButton2(Vector2.new())
+    end)
+end)
+
+-- [[ INFO TAB ]] --
+local InfoSection = Info:NewSection("Credits")
+InfoSection:NewLabel("Script: PRIMO PUBLIC SCRIPT")
+InfoSection:NewLabel("Made by: PRIMO")
+InfoSection:NewLabel("SLH Clan Official")
+InfoSection:NewLabel("PRIMO ON TOP")
