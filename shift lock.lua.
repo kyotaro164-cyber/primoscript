@@ -1,109 +1,69 @@
---[[
-    PRIMO UNIVERSAL SHIFT LOCK (MOBILE FRIENDLY)
-    Inayos para sa GitHub at Executors
-]]
-
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-local mouse = player:GetMouse()
 
--- GUI Setup
+-- GUI Cleanup (Para hindi mag-duplicate)
+local oldGui = game:GetService("CoreGui"):FindFirstChild("PrimoUniversalLock")
+if oldGui then oldGui:Destroy() end
+
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "PrimoUniversalLock"
-screenGui.IgnoreGuiInset = true
-screenGui.Parent = game:GetService("CoreGui") -- Para hindi mawala kahit mamatay ang character
+screenGui.Parent = game:GetService("CoreGui")
 
--- Ang Tuldok sa Gitna (Crosshair)
 local centerDot = Instance.new("Frame")
-centerDot.Name = "CenterDot"
-centerDot.Size = UDim2.new(0, 5, 0, 5)
+centerDot.Size = UDim2.new(0, 6, 0, 6)
 centerDot.Position = UDim2.new(0.5, 0, 0.5, 0)
 centerDot.AnchorPoint = Vector2.new(0.5, 0.5)
 centerDot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-centerDot.BackgroundTransparency = 0.2
 centerDot.Visible = false
 centerDot.Parent = screenGui
+Instance.new("UICorner", centerDot).CornerRadius = UDim.new(1, 0)
 
-local dotCorner = Instance.new("UICorner")
-dotCorner.CornerRadius = UDim.new(1, 0)
-dotCorner.Parent = centerDot
-
--- Ang Pangalang "PRIMO" na nakapaikot sa bilog
 local primoText = Instance.new("TextLabel")
-primoText.Name = "PrimoCircleText"
-primoText.Text = "P R I M O" -- May spaces para maganda tignan sa pag-ikot
+primoText.Text = "P R I M O"
 primoText.Size = UDim2.new(0, 100, 0, 100)
 primoText.Position = UDim2.new(0.5, 0, 0.5, 0)
 primoText.AnchorPoint = Vector2.new(0.5, 0.5)
 primoText.BackgroundTransparency = 1
 primoText.TextColor3 = Color3.fromRGB(255, 255, 255)
-primoText.TextSize = 14
 primoText.Font = Enum.Font.GothamBold
+primoText.TextSize = 14
 primoText.Visible = false
 primoText.Parent = screenGui
+Instance.new("UIStroke", primoText).Thickness = 2
 
-local stroke = Instance.new("UIStroke")
-stroke.Thickness = 2
-stroke.Color = Color3.fromRGB(0, 0, 0)
-stroke.Parent = primoText
-
--- Mobile Button (Toggle)
 local toggleButton = Instance.new("ImageButton")
-toggleButton.Name = "LockButton"
 toggleButton.Size = UDim2.new(0, 60, 0, 60)
 toggleButton.Position = UDim2.new(0.85, 0, 0.5, 0)
 toggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-toggleButton.BackgroundTransparency = 0.5
-toggleButton.Image = "rbxassetid://6031068833" -- Lock Icon
+toggleButton.Image = "rbxassetid://6031068833"
 toggleButton.Parent = screenGui
-
-local btnCorner = Instance.new("UICorner")
-btnCorner.CornerRadius = UDim.new(1, 0)
-btnCorner.Parent = toggleButton
-
---------------------------------------------------------------------------------
--- SCRIPT LOGIC
---------------------------------------------------------------------------------
+Instance.new("UICorner", toggleButton).CornerRadius = UDim.new(1, 0)
 
 local active = false
-
-local function toggleLock()
+toggleButton.MouseButton1Click:Connect(function()
     active = not active
     if active then
-        -- ON
         centerDot.Visible = true
         primoText.Visible = true
         toggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         toggleButton.ImageColor3 = Color3.fromRGB(0, 0, 0)
-        
-        RunService:BindToRenderStep("PrimoLock", Enum.RenderPriority.Character.Value, function()
+        RunService:BindToRenderStep("PrimoLock", 200, function()
             UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
-            
-            -- Paikutin ang "Primo"
             primoText.Rotation = primoText.Rotation + 3
-            
-            -- Paharapin ang character sa camera
-            local character = player.Character
-            if character then
-                local root = character:FindFirstChild("HumanoidRootPart")
-                if root then
-                    local cam = workspace.CurrentCamera
-                    root.CFrame = CFrame.new(root.Position, root.Position + Vector3.new(cam.CFrame.LookVector.X, 0, cam.CFrame.LookVector.Z))
-                end
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local root = player.Character.HumanoidRootPart
+                local cam = workspace.CurrentCamera
+                root.CFrame = CFrame.new(root.Position, root.Position + Vector3.new(cam.CFrame.LookVector.X, 0, cam.CFrame.LookVector.Z))
             end
         end)
     else
-        -- OFF
         centerDot.Visible = false
         primoText.Visible = false
         toggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
         toggleButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
-        
         RunService:UnbindFromRenderStep("PrimoLock")
         UserInputService.MouseBehavior = Enum.MouseBehavior.Default
     end
-end
-
-toggleButton.MouseButton1Click:Connect(toggleLock)
+end)
