@@ -1,41 +1,44 @@
--- Muscle Legends Server Hopper
--- Optimized for GitHub Loadstring
+local button = script.Parent
+local player = game.Players.LocalPlayer
+local lighting = game:GetService("Lighting")
+local userSettings = UserSettings():GetService("UserGameSettings")
 
-if not game:IsLoaded() then
-    game.Loaded:Wait()
+local antiLag = false
+
+button.Text = "ANTI-LAG: OFF"
+
+local function applyAntiLag()
+	-- Lower graphics
+	userSettings.SavedQualityLevel = Enum.SavedQualitySetting.QualityLevel1
+	
+	-- Lighting optimization
+	lighting.GlobalShadows = false
+	lighting.FogEnd = 100000
+	lighting.Brightness = 1
+	
+	-- Remove heavy effects
+	for _, v in pairs(lighting:GetChildren()) do
+		if v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") then
+			v.Enabled = false
+		end
+	end
 end
 
-local TeleportService = game:GetService("TeleportService")
-local HttpService = game:GetService("HttpService")
-local PlaceId = game.PlaceId
-local JobId = game.JobId
-
--- Notification para sa User
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "Server Hopper",
-    Text = "Naghahanap ng bagong server...",
-    Duration = 5
-})
-
-local function Teleport()
-    local Success, Error = pcall(function()
-        -- Kinukuha ang listahan ng servers na may kaunting players
-        local Site = HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
-        
-        for _, server in pairs(Site.data) do
-            if server.playing < server.maxPlayers and server.id ~= JobId then
-                TeleportService:TeleportToPlaceInstance(PlaceId, server.id, game.Players.LocalPlayer)
-                return
-            end
-        end
-    end)
-
-    if not Success then
-        warn("Teleport Error: " .. tostring(Error))
-        -- Retry pagkatapos ng 5 seconds kung nag-fail
-        task.wait(5)
-        Teleport()
-    end
+local function removeAntiLag()
+	-- Let player control graphics again
+	userSettings.SavedQualityLevel = Enum.SavedQualitySetting.Automatic
+	
+	lighting.GlobalShadows = true
 end
 
-Teleport()
+button.MouseButton1Click:Connect(function()
+	if antiLag then
+		removeAntiLag()
+		button.Text = "ANTI-LAG: OFF"
+		antiLag = false
+	else
+		applyAntiLag()
+		button.Text = "ANTI-LAG: ON"
+		antiLag = true
+	end
+end)
